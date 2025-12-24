@@ -1,11 +1,13 @@
 import os
-from box.exceptions import BoxValueError
-import yaml
-from src.textSummarizer.logging import logger
-from ensure import ensure_annotations
-from box import ConfigBox
 from pathlib import Path
 from typing import Any
+
+import yaml
+from box import ConfigBox
+from box.exceptions import BoxValueError
+from ensure import ensure_annotations
+
+from src.textSummarizer.logging import logger
 
 
 @ensure_annotations
@@ -31,7 +33,8 @@ def read_yaml(path_to_yaml: Path) -> ConfigBox:
         raise ValueError("yaml file is empty")
     except Exception as e:
         raise e
-    
+
+
 @ensure_annotations
 def create_directories(path_to_directories: list, verbose=True):
     """create list of directories
@@ -44,4 +47,3 @@ def create_directories(path_to_directories: list, verbose=True):
         os.makedirs(path, exist_ok=True)
         if verbose:
             logger.info(f"created directory at: {path}")
-
