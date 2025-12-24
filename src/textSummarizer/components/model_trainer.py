@@ -2,8 +2,13 @@ import os
 
 import torch
 from datasets import load_from_disk
-from transformers import (AutoModelForSeq2SeqLM, AutoTokenizer,
-                          DataCollatorForSeq2Seq, Trainer, TrainingArguments)
+from transformers import (
+    AutoModelForSeq2SeqLM,
+    AutoTokenizer,
+    DataCollatorForSeq2Seq,
+    Trainer,
+    TrainingArguments,
+)
 
 from src.textSummarizer.entity import ModelTrainerConfig
 

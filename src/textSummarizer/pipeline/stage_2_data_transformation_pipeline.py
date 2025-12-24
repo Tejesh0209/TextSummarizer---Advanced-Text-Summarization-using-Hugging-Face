@@ -1,5 +1,4 @@
-from src.textSummarizer.components.data_transformation import \
-    DataTransformation
+from src.textSummarizer.components.data_transformation import DataTransformation
 from src.textSummarizer.config.configuration import ConfigurationManager
 from src.textSummarizer.logging import logger
 
