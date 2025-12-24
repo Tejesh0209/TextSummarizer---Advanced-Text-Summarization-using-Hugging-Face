@@ -2,9 +2,10 @@
 .git
 .gitignore
 .gitattributes
+.github/
 
 # Python
-__pycache__
+__pycache__/
 *.py[cod]
 *$py.class
 *.so
@@ -27,11 +28,13 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.pyc
 
 # Virtual environments
 .venv
 venv/
 ENV/
+env/
 
 # IDE
 .vscode/
@@ -40,14 +43,47 @@ ENV/
 *.swo
 *~
 .DS_Store
+.nvmrc
 
 # Documentation
 docs/
 *.md
 LICENSE
+research/
 
 # Testing
 .pytest_cache/
+.coverage
+htmlcov/
+.tox/
+tests/
+
+# CI/CD
+.gitlab-ci.yml
+.travis.yml
+azure-pipelines.yml
+
+# OS
+.DS_Store
+.AppleDouble
+.LSOverride
+Thumbs.db
+*.log
+logs/
+
+# Node (if exists)
+node_modules/
+npm-debug.log*
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*.swo
+*~
+
+# Large files
+artifacts/
 .coverage
 htmlcov/
 

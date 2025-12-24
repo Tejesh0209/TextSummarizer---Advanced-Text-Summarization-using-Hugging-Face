@@ -10,20 +10,16 @@ ENV PYTHONUNBUFFERED=1 \
 # Set working directory in container
 WORKDIR /app
 
-# Install system dependencies
+# Install only essential system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    build-essential \
     curl \
-    git \
-    wget \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Copy requirements file
+# Copy and install Python dependencies first (better layer caching)
 COPY requirements.txt .
-
-# Install Python dependencies
 RUN pip install --upgrade pip setuptools wheel && \
-    pip install -r requirements.txt
+    pip install -r requirements.txt && \
+    pip cache purge
 
 # Copy project files
 COPY . .
