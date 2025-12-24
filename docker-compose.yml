@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  text-summarizer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: text-summarizer-app
+    ports:
+      - "8080:8080"
+    environment:
+      - PYTHONUNBUFFERED=1
+      - PYTHONDONTWRITEBYTECODE=1
+    volumes:
+      - ./artifacts:/app/artifacts
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/docs"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
