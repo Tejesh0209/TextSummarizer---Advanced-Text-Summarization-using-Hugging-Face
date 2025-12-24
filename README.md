@@ -427,6 +427,162 @@ docker run -p 8080:8080 text-summarizer:latest
 
 ---
 
+## CI/CD Pipeline with GitHub Actions
+
+This project includes a comprehensive **Continuous Integration/Continuous Deployment (CI/CD)** pipeline using GitHub Actions.
+
+### Workflow Overview
+
+**File**: `.github/workflows/main.yaml`
+
+The pipeline consists of three automated jobs:
+
+#### 1. **Continuous Integration (Testing & Linting)**
+-  Checks code quality with Black (Python formatter)
+- Validates import sorting with isort
+- Lints code with Flake8
+- Runs unit tests
+- Only proceeds if all checks pass
+
+#### 2. **Continuous Delivery (Build & Push to ECR)**
+- Builds Docker image from Dockerfile
+- Tags image with commit SHA and `latest`
+- Pushes to **Amazon ECR** (Elastic Container Registry)
+- Creates versioned releases for rollback capability
+
+#### 3. **Continuous Deployment (Deploy to EC2)**
+- Pulls latest image from ECR
+- Stops and removes old container
+- Deploys new container to EC2 instance
+- Verifies container is running
+- Performs health check on API endpoints
+
+### Pipeline Flow
+
+```
+GitHub Push (main branch)
+        ↓
+┌───────────────────────────────┐
+│   Integration Tests           │ (Code quality & linting)
+│   - Black formatting check    │
+│   - isort import check        │
+│   - Flake8 linting           │
+│   - Unit tests               │
+└─────────────┬─────────────────┘
+              ↓ (if all pass)
+┌───────────────────────────────┐
+│   Build & Push to ECR         │ (Docker image)
+│   - Docker build              │
+│   - Tag with commit SHA       │
+│   - Push to Amazon ECR        │
+└─────────────┬─────────────────┘
+              ↓
+┌───────────────────────────────┐
+│   Deploy to EC2               │ (Production)
+│   - Pull from ECR             │
+│   - Stop old container        │
+│   - Start new container       │
+│   - Health check             │
+│   - API verification         │
+└───────────────────────────────┘
+```
+
+### Deployment Architecture
+
+```
+┌─────────────────────┐
+│  GitHub Repository  │
+│   (main branch)     │
+└──────────┬──────────┘
+           │ (trigger on push)
+           ↓
+┌─────────────────────────────┐
+│  GitHub Actions Workflow    │
+│  - Integration Tests        │
+│  - Build Docker Image       │
+│  - Security Scanning        │
+└──────────┬──────────────────┘
+           │ (push image)
+           ↓
+┌─────────────────────────────┐
+│  Amazon ECR Registry        │
+│  (Container Image Storage)  │
+└──────────┬──────────────────┘
+           │ (pull & deploy)
+           ↓
+┌─────────────────────────────┐
+│  AWS EC2 Instance           │
+│  - Running Docker Container │
+│  - Port 8080 exposed        │
+│  - FastAPI Server           │
+└─────────────────────────────┘
+```
+
+### AWS Configuration Required
+
+Before the CI/CD pipeline works, set up the following AWS resources:
+
+#### 1. **Create IAM Role for GitHub Actions**
+### GitHub Repository Secrets
+
+Add the following secrets to your GitHub repository (Settings → Secrets and variables):
+
+| Secret Name | Value |
+|------------|-------|
+| `AWS_ACCESS_KEY_ID` | Your AWS access key |
+| `AWS_SECRET_ACCESS_KEY` | Your AWS secret access key |
+| `AWS_REGION` | `us-east-1` (or your region) |
+| `ECR_REPOSITORY_NAME` | `text-summarizer` |
+
+### Monitoring the Pipeline
+
+1. **Push to main branch**:
+   ```bash
+   git add .
+   git commit -m "Your changes"
+   git push origin main
+   ```
+
+2. **Check GitHub Actions**:
+   - Go to: https://github.com/Tejesh0209/TextSummarizer---Advanced-Text-Summarization-using-Hugging-Face/actions
+   - Watch the workflow execute in real-time
+   - View logs for each job
+
+3. **Verify Deployment**:
+   ```bash
+   # SSH to EC2 instance
+   ssh -i your-key.pem ec2-user@your-ec2-ip
+   
+   # Check running containers
+   docker ps
+   
+   # View logs
+   docker logs text-summarizer
+   
+   # Test API
+   curl http://localhost:8080/docs
+   ```
+
+### Rollback Process
+
+If deployment fails:
+
+1. **Automatic rollback**: Old container is preserved during deployment
+2. **Manual rollback**: SSH to EC2 and run previous image tag:
+   ```bash
+   docker stop text-summarizer
+   docker run -d -p 8080:8080 --name text-summarizer \
+     <ECR_URI>/text-summarizer:<previous-commit-sha>
+   ```
+
+### Cost Optimization
+
+- **ECR**: Only charged for storage (~$0.10 per GB/month)
+- **GitHub Actions**: Free tier includes 2000 minutes/month
+- **EC2**: Charges per hour (t3.medium ~$0.04/hour)
+
+---
+
 ## Performance Considerations
 
 ### Computational Requirements
